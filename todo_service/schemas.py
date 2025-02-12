@@ -40,6 +40,14 @@ class ListOut(ListBase):
 
 class ListCreate(ListBase):
     user_id: UUID
+    
+
+class ListCreateOut(ListBase):
+    id: int
+    user_id: UUID
+    
+    class Config:
+        from_attributes = True
 
 
 class ListUpdate(ListBase):
@@ -61,8 +69,8 @@ class TodoBase(BaseModel):
 class TodoOut(TodoBase):
     id: int
     list_id: int
-    timestamp: datetime
-    is_completed: bool
+    created_at: datetime
+    completed: bool
 
     class Config:
         from_attributes = True
@@ -74,4 +82,4 @@ class TodoCreate(TodoBase):
 
 class TodoUpdate(TodoBase):
     title: str | None = None
-    is_completed: bool | None = False
+    completed: bool | None = False

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from todo_service.auth import get_current_user, CurrentUserDep
 from todo_service.dependencies import DBSessionDep
-from todo_service.schemas import ListOut, ListBase, ListUpdate, ListUpdateOut
+from todo_service.schemas import ListOut, ListBase, ListUpdate, ListUpdateOut, ListCreateOut
 from todo_service.crud.lists import (
     get_lists,
     create_list_in_db,
@@ -16,7 +16,7 @@ router = APIRouter(tags=["Lists"], dependencies=[Depends(get_current_user)])
 
 
 @router.post(
-    "/lists", response_model=ListOut, status_code=status.HTTP_201_CREATED
+    "/lists", response_model=ListCreateOut, status_code=status.HTTP_201_CREATED
 )
 async def create_list(
     *, current_user: CurrentUserDep, db: DBSessionDep, data: ListBase
