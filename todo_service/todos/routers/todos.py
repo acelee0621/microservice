@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from todo_service.core.auth import get_current_user, CurrentUserDep
 from todo_service.core.dependencies import DBSessionDep
-from todo_service.todos.schemas import TodoCreate, TodoOut, TodoUpdate
+from todo_service.todos.schemas import TodoCreate, TodoUpdate, TodoResponse
 from todo_service.todos.crud.todos import (
     create_todo_item,
     delete_todo,
@@ -16,19 +16,19 @@ from todo_service.todos.crud.todos import (
 router = APIRouter(tags=["Todos"], dependencies=[Depends(get_current_user)])
 
 
-@router.post("/todos", response_model=TodoOut, status_code=status.HTTP_201_CREATED)
+@router.post("/todos", response_model=TodoResponse, status_code=status.HTTP_201_CREATED)
 async def create_todo(current_user: CurrentUserDep, db: DBSessionDep, data: TodoCreate):
     created_todo = await create_todo_item(data=data, db=db, current_user=current_user)
     return created_todo
 
 
-@router.get("/todos", response_model=list[TodoOut])
+@router.get("/todos", response_model=list[TodoResponse])
 async def get_all_todos(current_user: CurrentUserDep, db: DBSessionDep):
-    all_todos = await get_todos(db=db, current_user=current_user)    
+    all_todos = await get_todos(db=db, current_user=current_user)
     return all_todos
 
 
-@router.get("/todos/list/{list_id}", response_model=list[TodoOut])
+@router.get("/todos/list/{list_id}", response_model=list[TodoResponse])
 async def get_todos_by_list_id(
     list_id: int, db: DBSessionDep, current_user: CurrentUserDep
 ):
@@ -38,7 +38,7 @@ async def get_todos_by_list_id(
     return todos
 
 
-@router.get("/todos/{todo_id}", response_model=TodoOut)
+@router.get("/todos/{todo_id}", response_model=TodoResponse)
 async def get_todo_by_id(todo_id: int, db: DBSessionDep, current_user: CurrentUserDep):
     todo = await get_todo(todo_id=todo_id, db=db, current_user=current_user)
     if not todo:
@@ -46,7 +46,9 @@ async def get_todo_by_id(todo_id: int, db: DBSessionDep, current_user: CurrentUs
     return todo
 
 
-@router.put("/todos/{todo_id}", response_model=TodoOut, status_code=status.HTTP_200_OK)
+@router.put(
+    "/todos/{todo_id}", response_model=TodoResponse, status_code=status.HTTP_200_OK
+)
 async def update_todo_endpoint(
     todo_id: int, data: TodoUpdate, db: DBSessionDep, current_user: CurrentUserDep
 ):

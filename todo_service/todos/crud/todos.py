@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 
 from todo_service.todos.models import Todo
-from todo_service.todos.schemas import TodoCreate, TodoOut, TodoUpdate
+from todo_service.todos.schemas import TodoCreate, TodoUpdate, TodoResponse
 
 
 async def create_todo_item(db: AsyncSession, data: TodoCreate, current_user):
@@ -18,7 +18,7 @@ async def create_todo_item(db: AsyncSession, data: TodoCreate, current_user):
     try:
         await db.commit()
         await db.refresh(new_todo)
-        return TodoOut.model_validate(new_todo)
+        return TodoResponse.model_validate(new_todo)
     except SQLAlchemyError:
         await db.rollback()
         raise HTTPException(status_code=500, detail="Database error, create failed")
@@ -29,17 +29,19 @@ async def get_todos(db: AsyncSession, current_user):
         query = select(Todo).where(Todo.user_id == current_user.id)
         result = await db.scalars(query)
         todos = result.all()
-        return [TodoOut.model_validate(todo) for todo in todos]
+        return [TodoResponse.model_validate(todo) for todo in todos]
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error, get todos failed")
 
 
 async def get_todos_in_list(list_id: int, db: AsyncSession, current_user):
     try:
-        query = select(Todo).where(Todo.list_id == list_id, Todo.user_id == current_user.id)
+        query = select(Todo).where(
+            Todo.list_id == list_id, Todo.user_id == current_user.id
+        )
         result = await db.scalars(query)
         todos = result.all()
-        return [TodoOut.model_validate(todo) for todo in todos]
+        return [TodoResponse.model_validate(todo) for todo in todos]
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error, get todos failed")
 
@@ -51,7 +53,7 @@ async def get_todo(todo_id: int, db: AsyncSession, current_user):
         todo = result.first()
         if not todo:
             return None
-        return TodoOut.model_validate(todo)
+        return TodoResponse.model_validate(todo)
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error, get todo failed")
 
@@ -72,7 +74,7 @@ async def update_todo(todo_id: int, data: TodoUpdate, db: AsyncSession, current_
         db.add(todo_item)
         await db.commit()
         await db.refresh(todo_item)
-        return TodoOut.model_validate(todo_item)
+        return TodoResponse.model_validate(todo_item)
     except SQLAlchemyError:
         await db.rollback()
         raise HTTPException(status_code=500, detail="Database error, update failed")

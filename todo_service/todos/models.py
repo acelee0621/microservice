@@ -5,7 +5,6 @@ from sqlalchemy import Boolean, Integer, String, Text, ForeignKey, UniqueConstra
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 
 
-
 # 基础类
 class Base(DeclarativeBase):
     pass
@@ -14,7 +13,7 @@ class Base(DeclarativeBase):
 class TodoList(Base):
     __tablename__ = "lists"
 
-    id: Mapped[int] = mapped_column(Integer,primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(
         String(64), default="My List", index=True, nullable=False
     )
@@ -24,7 +23,7 @@ class TodoList(Base):
 
     # 一对多关系保留（与 Todo 的关系）
     todos: Mapped[list["Todo"]] = relationship(
-        "Todo", back_populates="list", cascade="all, delete-orphan"
+        "Todo", back_populates="list", cascade="all, delete-orphan", lazy=False
     )
     # 唯一约束保留（确保同一用户的列表标题不重复）
     __table_args__ = (
@@ -42,7 +41,7 @@ class Todo(Base):
         index=True, default=lambda: datetime.now(timezone.utc)
     )
     completed: Mapped[bool] = mapped_column(
-        Boolean,default=False, index=True, nullable=False
+        Boolean, default=False, index=True, nullable=False
     )
     # 外键保留（关联业务数据库的 List 表）
     list_id: Mapped[int] = mapped_column(ForeignKey("lists.id"), nullable=False)

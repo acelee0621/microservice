@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from todo_service.core.auth import get_current_user, CurrentUserDep
 from todo_service.core.dependencies import DBSessionDep
-from todo_service.todos.schemas import ListOut, ListBase, ListUpdate, ListUpdateOut, ListCreateOut
+from todo_service.todos.schemas import ListCreate, ListUpdate, ListResponse
 from todo_service.todos.crud.lists import (
     get_lists,
     create_list_in_db,
@@ -15,23 +15,21 @@ from todo_service.todos.crud.lists import (
 router = APIRouter(tags=["Lists"], dependencies=[Depends(get_current_user)])
 
 
-@router.post(
-    "/lists", response_model=ListCreateOut, status_code=status.HTTP_201_CREATED
-)
+@router.post("/lists", response_model=ListResponse, status_code=status.HTTP_201_CREATED)
 async def create_list(
-    *, current_user: CurrentUserDep, db: DBSessionDep, data: ListBase
+    *, current_user: CurrentUserDep, db: DBSessionDep, data: ListCreate
 ):
     created_list = await create_list_in_db(data=data, db=db, current_user=current_user)
     return created_list
 
 
-@router.get("/lists", response_model=list[ListOut])
+@router.get("/lists", response_model=list[ListResponse])
 async def get_all_lists(current_user: CurrentUserDep, db: DBSessionDep):
-    all_list = await get_lists(db=db, current_user=current_user)    
+    all_list = await get_lists(db=db, current_user=current_user)
     return all_list
 
 
-@router.get("/lists/{list_id}", response_model=ListOut)
+@router.get("/lists/{list_id}", response_model=ListResponse)
 async def get_list(
     list_id: int,
     db: DBSessionDep,
@@ -44,7 +42,7 @@ async def get_list(
 
 
 @router.put(
-    "/lists/{list_id}", response_model=ListUpdateOut, status_code=status.HTTP_200_OK
+    "/lists/{list_id}", response_model=ListResponse, status_code=status.HTTP_200_OK
 )
 async def update_list_endpoint(
     list_id: int, data: ListUpdate, db: DBSessionDep, current_user: CurrentUserDep
