@@ -43,7 +43,7 @@ async def get_list_by_id(list_id: int, db: AsyncSession, current_user):
             .options(selectinload(TodoList.todos))
         )
         result = await db.scalars(query)
-        list_ = result.one_or_none()        
+        list_ = result.first()        
         if not list_:
             return None
         return ListOut.model_validate(list_)
@@ -84,7 +84,7 @@ async def delete_list(list_id: int, db: AsyncSession, current_user):
 
         await db.delete(list_item)
         await db.commit()
-        return list_item  # 返回被删除的对象
+        return list_item
     except SQLAlchemyError:  # 仅捕获 SQL 相关异常，避免不必要的 broad exception
         await db.rollback()
         raise HTTPException(status_code=500, detail="Database error, delete failed")

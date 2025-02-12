@@ -48,7 +48,7 @@ async def get_todo(todo_id: int, db: AsyncSession, current_user):
     try:
         query = select(Todo).where(Todo.id == todo_id, Todo.user_id == current_user.id)
         result = await db.scalars(query)
-        todo = result.one_or_none()
+        todo = result.first()
         if not todo:
             return None
         return TodoOut.model_validate(todo)
@@ -87,7 +87,7 @@ async def delete_todo(todo_id: int, db: AsyncSession, current_user):
             return None  # 返回 None 表示未找到待删除的项
         await db.delete(todo_item)
         await db.commit()  # 提交事务
-        return todo_item  # 返回被删除的对象
+        return todo_item
     except SQLAlchemyError:
         await db.rollback()  # 回滚事务
         raise HTTPException(status_code=500, detail="Database error, delete failed")

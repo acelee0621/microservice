@@ -24,9 +24,7 @@ async def create_todo(current_user: CurrentUserDep, db: DBSessionDep, data: Todo
 
 @router.get("/todos", response_model=list[TodoOut])
 async def get_all_todos(current_user: CurrentUserDep, db: DBSessionDep):
-    all_todos = await get_todos(db=db, current_user=current_user)
-    if not all_todos:
-        raise HTTPException(status_code=404, detail="Items not found")
+    all_todos = await get_todos(db=db, current_user=current_user)    
     return all_todos
 
 

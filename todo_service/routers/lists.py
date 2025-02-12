@@ -27,9 +27,7 @@ async def create_list(
 
 @router.get("/lists", response_model=list[ListOut])
 async def get_all_lists(current_user: CurrentUserDep, db: DBSessionDep):
-    all_list = await get_lists(db=db, current_user=current_user)
-    if not all_list:
-        raise HTTPException(status_code=404, detail="Lists not found")
+    all_list = await get_lists(db=db, current_user=current_user)    
     return all_list
 
 

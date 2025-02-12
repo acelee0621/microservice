@@ -1,7 +1,7 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
 from uuid import UUID
-
+from typing import List
 
 class UserRead(BaseModel):
     id: UUID
@@ -9,77 +9,59 @@ class UserRead(BaseModel):
     is_active: bool
     is_superuser: bool
     is_verified: bool
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-    expires_in: int
-
-
-class TokenData(BaseModel):
-    username: str | None = None
-
-
-class ListBase(BaseModel):
-    title: str
-    description: str | None = None
-
-    class Config:
-        from_attributes = True
-
-
-class ListOut(ListBase):
-    id: int
-    user_id: UUID
-    todos: list["TodoOut"] | None = None
-
-    class Config:
-        from_attributes = True
-
-
-class ListCreate(ListBase):
-    user_id: UUID
     
-
-class ListCreateOut(ListBase):
-    id: int
-    user_id: UUID
     
-    class Config:
-        from_attributes = True
-
-
-class ListUpdate(ListBase):
-    title: str | None = None
-
-
-class ListUpdateOut(ListBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-
-
 class TodoBase(BaseModel):
     title: str
     description: str | None = None
-
 
 class TodoOut(TodoBase):
     id: int
     list_id: int
     created_at: datetime
     completed: bool
+    user_id: UUID
 
-    class Config:
-        from_attributes = True
-
+    model_config = ConfigDict(from_attributes=True)
 
 class TodoCreate(TodoBase):
     list_id: int
 
-
-class TodoUpdate(TodoBase):
+class TodoUpdate(BaseModel):  # 继承 BaseModel 避免继承 title
     title: str | None = None
-    completed: bool | None = False
+    description: str | None = None
+    completed: bool | None = None  # 避免默认 False
+    
+    
+
+class ListBase(BaseModel):
+    title: str
+    description: str | None = None 
+
+    model_config = ConfigDict(from_attributes=True)
+
+class ListOut(ListBase):
+    id: int
+    user_id: UUID
+    todos: List["TodoOut"] | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+class ListCreate(ListBase):
+    pass  # 移除 user_id
+
+class ListCreateOut(ListBase):
+    id: int
+    user_id: UUID
+
+    model_config = ConfigDict(from_attributes=True)
+
+class ListUpdate(BaseModel):  # 继承 BaseModel 避免继承 title
+    title: str | None = None
+    description: str | None = None
+
+class ListUpdateOut(ListBase):
+    id: int
+
+    model_config = ConfigDict(from_attributes=True)
+
