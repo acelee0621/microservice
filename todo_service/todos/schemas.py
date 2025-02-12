@@ -1,7 +1,6 @@
 from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
 from uuid import UUID
-from typing import List
 
 
 class UserRead(BaseModel):
@@ -54,6 +53,6 @@ class ListUpdate(BaseModel):  # 继承 BaseModel 避免继承 title
 class ListResponse(ListBase):
     id: int
     user_id: UUID
-    todos: List[TodoResponse] | None = None
+    todos: list[TodoResponse] | None = None
 
     model_config = ConfigDict(from_attributes=True)
