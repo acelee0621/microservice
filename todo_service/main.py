@@ -4,11 +4,11 @@ from fastapi import FastAPI, Response, status, __version__ as fastapi_version
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from todo_service.config import config
-from todo_service.routers import lists, todos
-from todo_service.database import create_db_and_tables
-from todo_service.redis_db import redis_connect
-from todo_service.auth import CurrentUserDep
+from todo_service.core.config import config
+from todo_service.todos.routers import lists, todos
+from todo_service.core.database import create_db_and_tables
+from todo_service.core.redis_db import redis_connect
+from todo_service.core.auth import CurrentUserDep
 
 
 @asynccontextmanager

@@ -4,7 +4,7 @@ import httpx
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from todo_service.database import get_db
+from todo_service.core.database import get_db
 
 
 

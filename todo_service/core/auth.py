@@ -4,8 +4,8 @@ import httpx
 from fastapi import HTTPException, Security, Depends
 from fastapi.security import OAuth2PasswordBearer
 
-from todo_service.dependencies import CacheRedisDep, HttpClientDep
-from todo_service.schemas import UserRead
+from todo_service.core.dependencies import CacheRedisDep, HttpClientDep
+from todo_service.todos.schemas import UserRead
 
 # 用户管理微服务的 URL
 USER_SERVICE_URL = "http://127.0.0.1:8000"

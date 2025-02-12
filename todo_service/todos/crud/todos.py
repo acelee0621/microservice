@@ -3,8 +3,8 @@ from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 
-from todo_service.models import Todo
-from todo_service.schemas import TodoCreate, TodoOut, TodoUpdate
+from todo_service.todos.models import Todo
+from todo_service.todos.schemas import TodoCreate, TodoOut, TodoUpdate
 
 
 async def create_todo_item(db: AsyncSession, data: TodoCreate, current_user):

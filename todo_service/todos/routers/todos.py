@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from todo_service.auth import get_current_user, CurrentUserDep
-from todo_service.dependencies import DBSessionDep
-from todo_service.schemas import TodoCreate, TodoOut, TodoUpdate
-from todo_service.crud.todos import (
+from todo_service.core.auth import get_current_user, CurrentUserDep
+from todo_service.core.dependencies import DBSessionDep
+from todo_service.todos.schemas import TodoCreate, TodoOut, TodoUpdate
+from todo_service.todos.crud.todos import (
     create_todo_item,
     delete_todo,
     get_todos,

@@ -1,7 +1,7 @@
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from todo_service.models import Base, TodoList, Todo
+from todo_service.todos.models import Base, TodoList, Todo
 
 
 SQLITE_DATABASE_URL = "sqlite+aiosqlite:///./todos.db"

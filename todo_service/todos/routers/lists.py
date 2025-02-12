@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from todo_service.auth import get_current_user, CurrentUserDep
-from todo_service.dependencies import DBSessionDep
-from todo_service.schemas import ListOut, ListBase, ListUpdate, ListUpdateOut, ListCreateOut
-from todo_service.crud.lists import (
+from todo_service.core.auth import get_current_user, CurrentUserDep
+from todo_service.core.dependencies import DBSessionDep
+from todo_service.todos.schemas import ListOut, ListBase, ListUpdate, ListUpdateOut, ListCreateOut
+from todo_service.todos.crud.lists import (
     get_lists,
     create_list_in_db,
     get_list_by_id,
