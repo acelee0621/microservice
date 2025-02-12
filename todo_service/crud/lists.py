@@ -16,7 +16,7 @@ async def create_list_in_db(db: AsyncSession, current_user, data: ListBase):
     try:        
         await db.commit()
         await db.refresh(new_list)
-        return ListUpdateOut.model_validate(new_list)
+        return ListOut.model_validate(new_list)
     except SQLAlchemyError: 
         await db.rollback()
         raise HTTPException(status_code=500, detail="Database error, create failed")
