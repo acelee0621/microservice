@@ -9,6 +9,7 @@ from todo_service.todos.routers import lists, todos
 from todo_service.core.database import create_db_and_tables
 from todo_service.core.redis_db import redis_connect
 from todo_service.core.auth import CurrentUserDep
+from todo_service.todos.routers import lists_routes
 
 
 @asynccontextmanager
@@ -34,7 +35,8 @@ app.add_middleware(
 )
 
 
-app.include_router(lists.router)
+# app.include_router(lists.router)
+app.include_router(lists_routes.router)
 app.include_router(todos.router)
 
 

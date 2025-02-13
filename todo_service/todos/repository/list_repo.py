@@ -56,7 +56,7 @@ class TodoListRepository:
             .options(selectinload(TodoList.todos))
         )
         result = await self.session.scalars(query)
-        list_ = result.scalar_one_or_none()
+        list_ = result.one_or_none()
         if not list_:
             raise NotFoundException(f"TodoList with id {list_id} not found")
         return list_
@@ -72,9 +72,9 @@ class TodoListRepository:
             .where(TodoList.user_id == current_user.id)
             .options(selectinload(TodoList.todos))
         )
-        return list(result.all())
+        return result.all()
 
-    async def update(self, list_id: int, data: ListUpdate, current_user) -> TodoList:        
+    async def update(self, list_id: int, data: ListUpdate, current_user) -> TodoList:
         """Update an existing TodoList item for the current user.
 
         Args:
@@ -107,8 +107,8 @@ class TodoListRepository:
                 f"TodoList with id {list_id} not found or does not belong to the current user"
             )
         await self.session.commit()
-        return await self.get_by_id(list_id)
-    
+        return await self.get_by_id(list_id, current_user)
+
     async def delete(self, list_id: int, current_user) -> None:
         """Delete an existing TodoList item for the current user.
 
@@ -119,7 +119,9 @@ class TodoListRepository:
         Raises:
             NotFoundException: If the TodoList is not found or does not belong to the current user.
         """
-        query = delete(TodoList).where(TodoList.id == list_id, TodoList.user_id == current_user.id)
+        query = delete(TodoList).where(
+            TodoList.id == list_id, TodoList.user_id == current_user.id
+        )
         result = await self.session.execute(query)
         if result.rowcount == 0:
             raise NotFoundException(f"TodoList with id {list_id} not found")
