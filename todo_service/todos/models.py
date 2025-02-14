@@ -22,8 +22,8 @@ class TodoList(Base):
     user_id: Mapped[UUID] = mapped_column(nullable=False)
 
     # 一对多关系保留（与 Todo 的关系）
-    todos: Mapped[list["Todo"]] = relationship(
-        "Todo", back_populates="list", cascade="all, delete-orphan", lazy=False
+    todos: Mapped[list["Todos"]] = relationship(
+        "Todos", back_populates="list", cascade="all, delete-orphan", lazy='selectin'
     )
     # 唯一约束保留（确保同一用户的列表标题不重复）
     __table_args__ = (
@@ -31,7 +31,7 @@ class TodoList(Base):
     )
 
 
-class Todo(Base):
+class Todos(Base):
     __tablename__ = "todos"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

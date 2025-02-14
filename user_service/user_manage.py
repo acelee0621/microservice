@@ -2,6 +2,7 @@ import uuid
 from typing import Optional
 
 from fastapi import Depends, Request
+from redis.asyncio import Redis
 from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
 from fastapi_users.authentication import (
     AuthenticationBackend,
@@ -9,8 +10,8 @@ from fastapi_users.authentication import (
     RedisStrategy    
 )
 from fastapi_users.db import SQLAlchemyUserDatabase
-from user_service.database import User, get_user_db
-from user_service.redis_db import AuthRedisDep
+from user_service.core.database import User, get_user_db
+from user_service.core.redis_db import get_auth_redis
 
 
 SECRET = "SECRET"
@@ -41,7 +42,7 @@ async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db
 bearer_transport = BearerTransport(tokenUrl="auth/redis/login")
 
 
-def get_redis_strategy(auth_redis: AuthRedisDep) -> RedisStrategy:
+def get_redis_strategy(auth_redis: Redis = Depends(get_auth_redis)) -> RedisStrategy:
     return RedisStrategy(auth_redis, lifetime_seconds=3600)
 
 

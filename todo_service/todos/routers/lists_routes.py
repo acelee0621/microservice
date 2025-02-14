@@ -12,7 +12,7 @@ router = APIRouter(tags=["Lists"], dependencies=[Depends(get_current_user)])
 
 
 def get_list_service(session: AsyncSession = Depends(get_db)) -> TodoListService:
-    """Dependency for getting hero service instance."""
+    """Dependency for getting list service instance."""
     repository = TodoListRepository(session)
     return TodoListService(repository)
 
@@ -23,6 +23,7 @@ async def create_list(
     service: TodoListService = Depends(get_list_service),
     current_user: UserRead = Depends(get_current_user),
 ) -> ListResponse:
+    """Create new list."""
     created_list = await service.create_list(data=data, current_user=current_user)
     return created_list
 
@@ -32,6 +33,7 @@ async def get_all_lists(
     service: TodoListService = Depends(get_list_service),
     current_user: UserRead = Depends(get_current_user),
 ):
+    """Get all lists."""
     all_list = await service.get_lists(current_user=current_user)
     return all_list
 
@@ -42,19 +44,21 @@ async def get_list(
     service: TodoListService = Depends(get_list_service),
     current_user: UserRead = Depends(get_current_user),
 ) -> ListResponse:
+    """Get list by id."""
     list_ = await service.get_list(list_id=list_id, current_user=current_user)
     return list_
 
 
-@router.put(
+@router.patch(
     "/lists/{list_id}", response_model=ListResponse, status_code=status.HTTP_200_OK
 )
-async def update_list_endpoint(
+async def update_list(
     list_id: int,
     data: ListUpdate,
     service: TodoListService = Depends(get_list_service),
     current_user: UserRead = Depends(get_current_user),
 ) -> ListResponse:
+    """Update list."""
     updated_list = await service.update_list(
         list_id=list_id, data=data, current_user=current_user
     )
@@ -62,9 +66,10 @@ async def update_list_endpoint(
 
 
 @router.delete("/lists/{list_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_list_endpoint(
+async def delete_list(
     list_id: int,
     service: TodoListService = Depends(get_list_service),
     current_user: UserRead = Depends(get_current_user),
 ) -> None:
+    """Delete list."""
     await service.delete_list(list_id=list_id, current_user=current_user)

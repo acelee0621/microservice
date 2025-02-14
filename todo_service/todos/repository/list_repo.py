@@ -1,4 +1,4 @@
-from sqlalchemy import delete, select, update
+from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -74,7 +74,7 @@ class TodoListRepository:
         )
         return result.all()
 
-    async def update(self, list_id: int, data: ListUpdate, current_user) -> TodoList:
+    async def update(self, list_id: int, data: ListUpdate, current_user) -> TodoList:        
         """Update an existing TodoList item for the current user.
 
         Args:
@@ -86,28 +86,27 @@ class TodoListRepository:
             TodoList: The updated TodoList item.
 
         Raises:
-            ValueError: If no fields are provided for update.
             NotFoundException: If the TodoList is not found or does not belong to the current user.
+            ValueError: If no fields are provided for update.
         """
-
-        update_data = data.model_dump(exclude_unset=True)
-        if not update_data:
-            raise ValueError("No fields to update")
-        # 确保不修改 `id` 和 `user_id`
-        update_data.pop("id", None)
-        update_data.pop("user_id", None)
-        query = (
-            update(TodoList)
-            .where(TodoList.id == list_id, TodoList.user_id == current_user.id)
-            .values(**update_data)
+        query = select(TodoList).where(
+            TodoList.id == list_id, TodoList.user_id == current_user.id
         )
-        result = await self.session.execute(query)
-        if result.rowcount == 0:
+        result = await self.session.scalars(query)
+        list_item = result.one_or_none()
+        if not list_item:
             raise NotFoundException(
                 f"TodoList with id {list_id} not found or does not belong to the current user"
             )
-        await self.session.commit()
-        return await self.get_by_id(list_id, current_user)
+        update_data = data.model_dump(exclude_unset=True, exclude_none=True)
+        if not update_data:
+            raise ValueError("No fields to update")        
+        for key, value in update_data.items():
+            # 确保不修改 id 和 user_id
+            if key not in {"id", "user_id"}:
+                setattr(list_item, key, value)        
+        await self.session.commit()        
+        return list_item
 
     async def delete(self, list_id: int, current_user) -> None:
         """Delete an existing TodoList item for the current user.
@@ -119,10 +118,10 @@ class TodoListRepository:
         Raises:
             NotFoundException: If the TodoList is not found or does not belong to the current user.
         """
-        query = delete(TodoList).where(
-            TodoList.id == list_id, TodoList.user_id == current_user.id
-        )
-        result = await self.session.execute(query)
-        if result.rowcount == 0:
+        list = await self.session.get(TodoList, list_id)
+
+        if not list or list.user_id != current_user.id:
             raise NotFoundException(f"TodoList with id {list_id} not found")
+
+        await self.session.delete(list)  # 触发 ORM 级联删除
         await self.session.commit()

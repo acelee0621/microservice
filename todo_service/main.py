@@ -5,12 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from todo_service.core.config import config
-from todo_service.todos.routers import todos
 from todo_service.core.database import create_db_and_tables
 from todo_service.core.redis_db import redis_connect
 from todo_service.core.auth import get_current_user
 from todo_service.todos.schemas import UserRead
-from todo_service.todos.routers import lists_routes
+from todo_service.todos.routers import lists_routes, todos_route
 
 
 @asynccontextmanager
@@ -37,7 +36,8 @@ app.add_middleware(
 
 
 app.include_router(lists_routes.router)
-app.include_router(todos.router)
+app.include_router(todos_route.router)
+# app.include_router(todos.router)
 
 
 @app.get("/server-status", include_in_schema=False)

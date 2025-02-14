@@ -1,7 +1,7 @@
 from fastapi import Request
 from redis.asyncio import Redis, ConnectionPool
 
-from user_service.config import config
+from user_service.core.config import config
 
 
 auth_pool = ConnectionPool.from_url(
