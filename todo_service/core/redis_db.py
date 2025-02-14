@@ -1,3 +1,4 @@
+from fastapi import Request
 from redis.asyncio import Redis, ConnectionPool
 
 from todo_service.core.config import config
@@ -21,3 +22,7 @@ async def redis_connect():
         print("redis连接超时")
     except Exception as e:
         print("redis连接异常", e)
+        
+        
+async def get_cache_redis(request:Request) -> Redis:
+    return request.app.state.cache_redis

@@ -1,19 +1,16 @@
-from typing import Annotated
-from fastapi import Request,Depends
-from redis.asyncio import Redis,ConnectionPool
-
-
+from fastapi import Request
+from redis.asyncio import Redis, ConnectionPool
 
 from user_service.config import config
-
 
 
 auth_pool = ConnectionPool.from_url(
     config.REDIS_URL, db=1, max_connections=10, decode_responses=True
 )
 
+
 async def redis_connect():
-    try:       
+    try:
         redis_client = Redis(connection_pool=auth_pool)
         is_connected = await redis_client.ping()
         if is_connected:
@@ -25,15 +22,7 @@ async def redis_connect():
         print("redis连接超时")
     except Exception as e:
         print("redis连接异常", e)
-        
-        
-async def get_auth_redis(request:Request) -> Redis:
+
+
+async def get_auth_redis(request: Request) -> Redis:
     return request.app.state.auth_redis
-
-
-
-
-AuthRedisDep = Annotated[Redis, Depends(get_auth_redis)]
-
-
-

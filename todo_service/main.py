@@ -1,14 +1,15 @@
 import sys
 import httpx
-from fastapi import FastAPI, Response, status, __version__ as fastapi_version
+from fastapi import Depends, FastAPI, Response, status, __version__ as fastapi_version
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from todo_service.core.config import config
-from todo_service.todos.routers import lists, todos
+from todo_service.todos.routers import todos
 from todo_service.core.database import create_db_and_tables
 from todo_service.core.redis_db import redis_connect
-from todo_service.core.auth import CurrentUserDep
+from todo_service.core.auth import get_current_user
+from todo_service.todos.schemas import UserRead
 from todo_service.todos.routers import lists_routes
 
 
@@ -35,7 +36,6 @@ app.add_middleware(
 )
 
 
-# app.include_router(lists.router)
 app.include_router(lists_routes.router)
 app.include_router(todos.router)
 
@@ -56,6 +56,6 @@ async def health_check(response: Response, token: str | None = None):
 
 
 @app.get("/protected-route")
-async def protected_route(current_user: CurrentUserDep):
+async def protected_route(current_user: UserRead = Depends(get_current_user)):
     """受保护的业务路由"""
     return {"message": "This is a protected route", "user": current_user}
