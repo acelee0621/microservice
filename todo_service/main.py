@@ -37,7 +37,6 @@ app.add_middleware(
 
 app.include_router(lists_routes.router)
 app.include_router(todos_route.router)
-# app.include_router(todos.router)
 
 
 @app.get("/server-status", include_in_schema=False)
@@ -57,5 +56,5 @@ async def health_check(response: Response, token: str | None = None):
 
 @app.get("/protected-route")
 async def protected_route(current_user: UserRead = Depends(get_current_user)):
-    """受保护的业务路由"""
+    """Protected route"""
     return {"message": "This is a protected route", "user": current_user}
