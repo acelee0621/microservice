@@ -8,5 +8,6 @@ dependencies = [
     "aiosqlite>=0.21.0",
     "fastapi-users[sqlalchemy]>=14.0.1",
     "fastapi[all]>=0.115.8",
+    "pytest>=8.3.4",
     "redis>=5.2.1",
 ]
