@@ -99,12 +99,11 @@ class TodoListRepository:
                 f"TodoList with id {list_id} not found or does not belong to the current user"
             )
         update_data = data.model_dump(exclude_unset=True, exclude_none=True)
+        # 确保不修改 id 和 user_id
+        update_data.pop("id", None)
+        update_data.pop("user_id", None)
         if not update_data:
-            raise ValueError("No fields to update")        
-        for key, value in update_data.items():
-            # 确保不修改 id 和 user_id
-            if key not in {"id", "user_id"}:
-                setattr(list_item, key, value)        
+            raise ValueError("No fields to update")
         await self.session.commit()        
         return list_item
 
