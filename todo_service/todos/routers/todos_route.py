@@ -39,7 +39,7 @@ async def get_all_todos(
         str | None, Query(description="Search todos by title or description")
     ] = None,
     order_by: Annotated[
-        str | None, Query(description="Order by field (e.g., created_at desc)")
+        str | None, Query(description="Order by field (e.g., created_at desc/asc)")
     ] = None,
     service: TodosService = Depends(get_todos_service),
     current_user: UserRead = Depends(get_current_user),
