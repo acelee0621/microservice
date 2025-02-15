@@ -1,5 +1,5 @@
 from todo_service.todos.repository.list_repo import TodoListRepository
-from todo_service.todos.schemas import ListResponse, ListCreate, ListUpdate
+from todo_service.todos.schemas import ListResponse, ListCreate, ListUpdate, TodoCreate, TodoResponse
 
 
 class TodoListService:
@@ -72,3 +72,32 @@ class TodoListService:
         """
 
         await self.repository.delete(list_id, current_user)
+        
+        
+    async def create_todo(self, list_id: int, data: TodoCreate, current_user) -> TodoResponse:
+        """Create a new TodoItem in a specific list for the current user.
+
+        Args:
+            list_id (int): The ID of the TodoList to create the TodoItem in.
+            data (TodoCreate): title and description of the new TodoItem.
+            current_user (User): current user.
+
+        Returns:
+            TodoResponse: newly created TodoItem item.
+        """
+        todo = await self.repository.create_todo(list_id,data, current_user)
+        return TodoResponse.model_validate(todo)
+    
+    
+    async def get_todos_in_list(self, list_id: int, current_user) -> list[TodoResponse]:
+        """Get all TodoItems in a given list for the current user.
+
+        Args:
+            list_id: The ID of the list to retrieve TodoItems from.
+            current_user (User): The current user requesting the TodoItems.
+
+        Returns:
+            list[TodoResponse]: List of all TodoItems in the list.
+        """
+        todos = await self.repository.get_todos_by_list_id(list_id, current_user)
+        return [TodoResponse.model_validate(todo) for todo in todos]

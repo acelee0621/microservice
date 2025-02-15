@@ -17,7 +17,7 @@ class TodoBase(BaseModel):
 
 
 class TodoCreate(TodoBase):
-    list_id: int
+    pass
 
 
 class TodoUpdate(BaseModel):  # 继承 BaseModel 避免继承 title

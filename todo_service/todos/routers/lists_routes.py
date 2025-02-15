@@ -5,7 +5,7 @@ from todo_service.core.database import get_db
 from todo_service.core.auth import get_current_user
 from todo_service.todos.repository.list_repo import TodoListRepository
 from todo_service.todos.service.list_service import TodoListService
-from todo_service.todos.schemas import ListCreate, ListUpdate, ListResponse, UserRead
+from todo_service.todos.schemas import ListCreate, ListUpdate, ListResponse, TodoCreate, TodoResponse, UserRead
 
 
 router = APIRouter(tags=["Lists"], dependencies=[Depends(get_current_user)])
@@ -28,6 +28,17 @@ async def create_list(
     return created_list
 
 
+@router.get("/lists/{list_id}", response_model=ListResponse)
+async def get_list(
+    list_id: int,
+    service: TodoListService = Depends(get_list_service),
+    current_user: UserRead = Depends(get_current_user),
+) -> ListResponse:
+    """Get list by id."""
+    list_ = await service.get_list(list_id=list_id, current_user=current_user)
+    return list_
+
+
 @router.get("/lists", response_model=list[ListResponse])
 async def get_all_lists(
     service: TodoListService = Depends(get_list_service),
@@ -38,15 +49,27 @@ async def get_all_lists(
     return all_list
 
 
-@router.get("/lists/{list_id}", response_model=ListResponse)
-async def get_list(
+@router.post("/lists/{list_id}/todos", response_model=TodoResponse, status_code=status.HTTP_201_CREATED)
+async def create_todo(
+    list_id: int,
+    data: TodoCreate,
+    service: TodoListService = Depends(get_list_service),
+    current_user: UserRead = Depends(get_current_user),
+)->TodoResponse:
+    """Create new todo in a specific list."""
+    created_todo = await service.create_todo(list_id=list_id, data=data, current_user=current_user)
+    return created_todo
+
+
+@router.get("/lists/{list_id}/todos", response_model=list[TodoResponse])
+async def get_todos_by_list_id(
     list_id: int,
     service: TodoListService = Depends(get_list_service),
     current_user: UserRead = Depends(get_current_user),
-) -> ListResponse:
-    """Get list by id."""
-    list_ = await service.get_list(list_id=list_id, current_user=current_user)
-    return list_
+)->list[TodoResponse]:
+    """Get all todos in specific list."""
+    todos = await service.get_todos_in_list(list_id=list_id, current_user=current_user)    
+    return todos
 
 
 @router.patch(

@@ -1,10 +1,11 @@
-from sqlalchemy import select
-from sqlalchemy.exc import SQLAlchemyError
+from uuid import UUID
+
+from sqlalchemy import select, desc, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from todo_service.core.exceptions import NotFoundException
 from todo_service.todos.models import Todos
-from todo_service.todos.schemas import TodoCreate, TodoUpdate
+from todo_service.todos.schemas import TodoUpdate
 
 
 class TodosRepository:
@@ -12,35 +13,6 @@ class TodosRepository:
 
     def __init__(self, session: AsyncSession):
         self.session = session
-
-    async def create(self, data: TodoCreate, current_user) -> Todos:
-        """Create a new TodoItem item for the current user.
-
-        Args:
-            data (TodoCreate): title and description of the new TodoItem.
-            current_user (User): current user.
-
-        Returns:
-            Todos: newly created TodoItem item.
-
-        Raises:
-            AlreadyExistsException: if a TodoItem with the same title already exists.
-        """
-
-        new_todo = Todos(
-            title=data.title,
-            description=data.description,
-            list_id=data.list_id,
-            user_id=current_user.id,
-        )
-        self.session.add(new_todo)
-        try:
-            await self.session.commit()
-            await self.session.refresh(new_todo)
-            return new_todo
-        except SQLAlchemyError as e:
-            await self.session.rollback()
-            raise Exception(f"Database operation failed, create failed {e}")
 
     async def get_by_id(self, todo_id: int, current_user) -> Todos:
         """Get a TodoItem by ID for the current user.
@@ -65,36 +37,41 @@ class TodosRepository:
             raise NotFoundException(f"TodoItem with id {todo_id} not found")
         return todo
 
-    async def get_all(self, current_user) -> list[Todos]:
-        """Get all TodoItems for the current user.
+    async def get_all(
+        self,
+        user_id: UUID,
+        list_id: int | None = None,
+        status: str | None = None,
+        search: str | None = None,
+        order_by: str | None = None,
+    ) -> list[Todos]:
+        """Get todos based on filters."""
 
-        Args:
-            current_user (User): current user.
+        query = select(Todos).where(Todos.user_id == user_id)
 
-        Returns:
-            list[Todos]: List of all TodoItems.
-        """
-        result = await self.session.scalars(
-            select(Todos).where(Todos.user_id == current_user.id)
-        )
-        return result.all()
+        if list_id:
+            query = query.where(Todos.list_id == list_id)
 
-    async def get_by_list_id(self, list_id: int, current_user) -> list[Todos]:
-        """Get all TodoItems for the current user in a given list.
+        if status:
+            if status == "finished":
+                query = query.where(Todos.completed.is_(True))
+            elif status == "unfinished":
+                query = query.where(Todos.completed.is_(False))
 
-        Args:
-            list_id (int): The ID of the list to retrieve TodoItems from.
-            current_user (User): The current user requesting the TodoItems.
+        if search:
+            query = query.where(
+                Todos.title.ilike(f"%{search}%")
+                | Todos.description.ilike(f"%{search}%")
+            )
 
-        Returns:
-            list[Todos]: List of all TodoItems in the list.
-        """
-        query = select(Todos).where(
-            Todos.list_id == list_id, Todos.user_id == current_user.id
-        )
+        if order_by:
+            if order_by == "created_at desc":
+                query = query.order_by(desc(Todos.created_at))
+            elif order_by == "created_at asc":
+                query = query.order_by(asc(Todos.created_at))
+
         result = await self.session.scalars(query)
-        todos = result.all()
-        return todos
+        return result.all()
 
     async def update(self, todo_id: int, data: TodoUpdate, current_user) -> Todos:
         """Update an existing TodoItem item for the current user.
@@ -111,7 +88,9 @@ class TodosRepository:
             ValueError: If no fields are provided for update.
             NotFoundException: If the TodoItem is not found or does not belong to the current user.
         """
-        query = select(Todos).where(Todos.id == todo_id, Todos.user_id == current_user.id)
+        query = select(Todos).where(
+            Todos.id == todo_id, Todos.user_id == current_user.id
+        )
         result = await self.session.scalars(query)
         todo_item = result.one_or_none()
         if not todo_item:
@@ -123,8 +102,12 @@ class TodosRepository:
         update_data.pop("list_id", None)
         update_data.pop("user_id", None)
         if not update_data:
-            raise ValueError("No fields to update")                    
+            raise ValueError("No fields to update")
+        # 动态更新字段
+        for key, value in update_data.items():
+            setattr(todo_item, key, value)
         await self.session.commit()
+        await self.session.refresh(todo_item)
         return todo_item
 
     async def delete(self, todo_id: int, current_user) -> None:
@@ -137,10 +120,12 @@ class TodosRepository:
         Raises:
             NotFoundException: If the TodoItem is not found or does not belong to the current user.
         """
-        query = select(Todos).where(Todos.id == todo_id, Todos.user_id == current_user.id)
+        query = select(Todos).where(
+            Todos.id == todo_id, Todos.user_id == current_user.id
+        )
         result = await self.session.scalars(query)
         todo_item = result.one_or_none()
-        if not todo_item:        
+        if not todo_item:
             raise NotFoundException(f"TodoItem with id {todo_id} not found")
         await self.session.delete(todo_item)
         await self.session.commit()

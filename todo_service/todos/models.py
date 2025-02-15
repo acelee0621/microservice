@@ -17,15 +17,12 @@ class TodoList(Base):
     title: Mapped[str] = mapped_column(
         String(64), default="My List", index=True, nullable=False
     )
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    # 改为普通字段（不再关联外键）
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)    
     user_id: Mapped[UUID] = mapped_column(nullable=False)
-
-    # 一对多关系保留（与 Todo 的关系）
     todos: Mapped[list["Todos"]] = relationship(
         "Todos", back_populates="list", cascade="all, delete-orphan", lazy='selectin'
     )
-    # 唯一约束保留（确保同一用户的列表标题不重复）
+    # 唯一约束（确保同一用户的列表标题不重复）
     __table_args__ = (
         UniqueConstraint("title", "user_id", name="unique_user_list_title"),
     )
@@ -42,10 +39,7 @@ class Todos(Base):
     )
     completed: Mapped[bool] = mapped_column(
         Boolean, default=False, index=True, nullable=False
-    )
-    # 外键保留（关联业务数据库的 List 表）
-    list_id: Mapped[int] = mapped_column(ForeignKey("lists.id"), nullable=False)
-    # 改为普通字段（不再关联外键）
-    user_id: Mapped[UUID] = mapped_column(nullable=False)
-    # 保留与 List 的关系
+    )    
+    list_id: Mapped[int] = mapped_column(ForeignKey("lists.id"), nullable=False)    
+    user_id: Mapped[UUID] = mapped_column(nullable=False)    
     list: Mapped["TodoList"] = relationship("TodoList", back_populates="todos")

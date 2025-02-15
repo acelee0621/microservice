@@ -1,5 +1,5 @@
 from todo_service.todos.repository.todo_repo import TodosRepository
-from todo_service.todos.schemas import TodoResponse, TodoCreate, TodoUpdate
+from todo_service.todos.schemas import TodoResponse, TodoUpdate
 
 
 class TodosService:
@@ -7,19 +7,6 @@ class TodosService:
         """Service layer for todos operations."""
 
         self.repository = repository
-
-    async def create_todo(self, data: TodoCreate, current_user) -> TodoResponse:
-        """Create a new TodoItem item for the current user.
-
-        Args:
-            data (TodoCreate): title and description of the new TodoItem.
-            current_user (User): current user.
-
-        Returns:
-            TodoResponse: newly created TodoItem item.
-        """
-        todo = await self.repository.create(data, current_user)
-        return TodoResponse.model_validate(todo)
 
     async def get_todo(self, todo_id: int, current_user) -> TodoResponse:
         """Get a TodoItem by ID for the current user.
@@ -34,29 +21,24 @@ class TodosService:
         list = await self.repository.get_by_id(todo_id, current_user)
         return TodoResponse.model_validate(list)
 
-    async def get_todos(self, current_user) -> list[TodoResponse]:
-        """Get all TodoItems for the current user.
+    async def get_todos(
+        self,
+        current_user,
+        list_id: int | None = None,
+        status: str | None = None,
+        search: str | None = None,
+        order_by: str | None = None,
+    ) -> list[TodoResponse]:
+        """Call repository to get filtered todos."""
 
-        Args:
-            current_user (User): current user.
+        todos = await self.repository.get_all(
+            user_id=current_user.id,
+            list_id=list_id,
+            status=status,
+            search=search,
+            order_by=order_by,
+        )
 
-        Returns:
-            list[TodoResponse]: List of all TodoItems.
-        """
-        todos = await self.repository.get_all(current_user)
-        return [TodoResponse.model_validate(todo) for todo in todos]
-
-    async def get_todos_in_list(self, list_id: int, current_user) -> list[TodoResponse]:
-        """Get all TodoItems in a given list for the current user.
-
-        Args:
-            list_id: The ID of the list to retrieve TodoItems from.
-            current_user (User): The current user requesting the TodoItems.
-
-        Returns:
-            list[TodoResponse]: List of all TodoItems in the list.
-        """
-        todos = await self.repository.get_by_list_id(list_id, current_user)
         return [TodoResponse.model_validate(todo) for todo in todos]
 
     async def update_todo(

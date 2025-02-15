@@ -1,11 +1,11 @@
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError,SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from todo_service.core.exceptions import AlreadyExistsException, NotFoundException
-from todo_service.todos.models import TodoList
-from todo_service.todos.schemas import ListCreate, ListUpdate
+from todo_service.todos.models import TodoList, Todos
+from todo_service.todos.schemas import ListCreate, ListUpdate, TodoCreate
 
 
 class TodoListRepository:
@@ -104,7 +104,10 @@ class TodoListRepository:
         update_data.pop("user_id", None)
         if not update_data:
             raise ValueError("No fields to update")
-        await self.session.commit()        
+        for key, value in update_data.items():
+            setattr(list_item, key, value)
+        await self.session.commit()
+        await self.session.refresh(list_item)        
         return list_item
 
     async def delete(self, list_id: int, current_user) -> None:
@@ -124,3 +127,52 @@ class TodoListRepository:
 
         await self.session.delete(list)  # 触发 ORM 级联删除
         await self.session.commit()
+        
+        
+    async def create_todo(self, list_id: int, data: TodoCreate, current_user) -> Todos:
+        """Create a new TodoItem in a specific list for the current user.
+
+        Args:
+            list_id (int): The ID of the TodoList to create the TodoItem in.
+            data (TodoCreate): title and description of the new TodoItem.
+            current_user (User): current user.
+
+        Returns:
+            Todos: newly created TodoItem item.
+
+        Raises:
+            AlreadyExistsException: if a TodoItem with the same title already exists.
+        """
+
+        new_todo = Todos(
+            title=data.title,
+            description=data.description,
+            list_id=list_id,
+            user_id=current_user.id,
+        )
+        self.session.add(new_todo)
+        try:
+            await self.session.commit()
+            await self.session.refresh(new_todo)
+            return new_todo
+        except SQLAlchemyError as e:
+            await self.session.rollback()
+            raise Exception(f"Database operation failed, create failed {e}")
+        
+        
+    async def get_todos_by_list_id(self, list_id: int, current_user) -> list[Todos]:
+        """Get all TodoItems for the current user in a specific list.
+
+        Args:
+            list_id (int): The ID of the list to retrieve TodoItems from.
+            current_user (User): The current user requesting the TodoItems.
+
+        Returns:
+            list[Todos]: List of all TodoItems in the list.
+        """
+        query = select(Todos).where(
+            Todos.list_id == list_id, Todos.user_id == current_user.id
+        )
+        result = await self.session.scalars(query)
+        todos = result.all()
+        return todos    
