@@ -15,10 +15,10 @@ class TodoList(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(
-        String(64), default="My List", index=True, nullable=False
+        String(64), default="My List", nullable=False
     )
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)    
-    user_id: Mapped[UUID] = mapped_column(nullable=False)
+    user_id: Mapped[UUID] = mapped_column(index=True, nullable=False)
     todos: Mapped[list["Todos"]] = relationship(
         "Todos", back_populates="list", cascade="all, delete-orphan", lazy='selectin'
     )
@@ -40,6 +40,6 @@ class Todos(Base):
     completed: Mapped[bool] = mapped_column(
         Boolean, default=False, index=True, nullable=False
     )    
-    list_id: Mapped[int] = mapped_column(ForeignKey("lists.id"), nullable=False)    
-    user_id: Mapped[UUID] = mapped_column(nullable=False)    
+    list_id: Mapped[int] = mapped_column(ForeignKey("lists.id"), index=True, nullable=False)    
+    user_id: Mapped[UUID] = mapped_column(index=True, nullable=False)    
     list: Mapped["TodoList"] = relationship("TodoList", back_populates="todos")
