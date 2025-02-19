@@ -69,8 +69,8 @@ class TodoListRepository:
         """
         result = await self.session.scalars(
             select(TodoList)
-            .where(TodoList.user_id == current_user.id)
-            .options(selectinload(TodoList.todos))
+            .where(TodoList.user_id == current_user.id)            
+            .options(selectinload(TodoList.todos))  # selectinload 多开查询，joinedload 一次查询            
         )
         return result.all()
 
