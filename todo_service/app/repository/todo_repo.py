@@ -3,9 +3,9 @@ from uuid import UUID
 from sqlalchemy import select, desc, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from todo_service.core.exceptions import NotFoundException
-from todo_service.todos.models import Todos
-from todo_service.todos.schemas import TodoUpdate
+from app.core.exceptions import NotFoundException
+from app.models.models import Todos
+from app.schemas.schemas import TodoUpdate
 
 
 class TodosRepository:

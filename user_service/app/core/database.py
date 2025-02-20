@@ -1,3 +1,4 @@
+import os
 from collections.abc import AsyncGenerator
 
 from fastapi import Depends
@@ -5,7 +6,10 @@ from fastapi_users.db import SQLAlchemyBaseUserTableUUID, SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
-DATABASE_URL = "sqlite+aiosqlite:///./test.db"
+
+# 从环境变量获取数据库路径，默认为 data/db.sqlite3
+database_path = os.getenv("SQLITE_DB_PATH", "data/users.sqlite3")
+DATABASE_URL = f"sqlite+aiosqlite:///{database_path}"
 
 
 class Base(DeclarativeBase):

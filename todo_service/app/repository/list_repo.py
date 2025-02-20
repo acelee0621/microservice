@@ -3,9 +3,9 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError,SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from todo_service.core.exceptions import AlreadyExistsException, NotFoundException
-from todo_service.todos.models import TodoList, Todos
-from todo_service.todos.schemas import ListCreate, ListUpdate, TodoCreate
+from app.core.exceptions import AlreadyExistsException, NotFoundException
+from app.models.models import TodoList, Todos
+from app.schemas.schemas import ListCreate, ListUpdate, TodoCreate
 
 
 class TodoListRepository:

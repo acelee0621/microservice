@@ -4,9 +4,9 @@ from fastapi import HTTPException, Security, Depends
 from fastapi.security import OAuth2PasswordBearer
 from redis.asyncio import Redis
 
-from todo_service.core.dependencies import get_http_client
-from todo_service.core.redis_db import get_cache_redis
-from todo_service.todos.schemas import UserRead
+from app.core.dependencies import get_http_client
+from app.core.redis_db import get_cache_redis
+from app.schemas.schemas import UserRead
 
 # 用户管理微服务的 URL
 USER_SERVICE_URL = "http://127.0.0.1:8000"

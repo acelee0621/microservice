@@ -1,5 +1,5 @@
-from todo_service.todos.repository.list_repo import TodoListRepository
-from todo_service.todos.schemas import ListResponse, ListCreate, ListUpdate, TodoCreate, TodoResponse
+from app.repository.list_repo import TodoListRepository
+from app.schemas.schemas import ListResponse, ListCreate, ListUpdate, TodoCreate, TodoResponse
 
 
 class TodoListService:

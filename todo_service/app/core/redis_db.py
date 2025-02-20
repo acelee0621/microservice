@@ -1,7 +1,7 @@
 from fastapi import Request
 from redis.asyncio import Redis, ConnectionPool
 
-from todo_service.core.config import config
+from app.core.config import config
 
 
 cache_pool = ConnectionPool.from_url(

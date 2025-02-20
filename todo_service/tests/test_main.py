@@ -1,8 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
-from todo_service.main import app
-from todo_service.core.auth import get_current_user
-from todo_service.todos.schemas import UserRead
+from app.main import app
+from app.core.auth import get_current_user
+from app.schemas.schemas import UserRead
 
 # 创建测试客户端
 client = TestClient(app)

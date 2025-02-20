@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from todo_service.core.database import get_db
-from todo_service.core.auth import get_current_user
-from todo_service.todos.repository.list_repo import TodoListRepository
-from todo_service.todos.service.list_service import TodoListService
-from todo_service.todos.schemas import ListCreate, ListUpdate, ListResponse, TodoCreate, TodoResponse, UserRead
+from app.core.database import get_db
+from app.core.auth import get_current_user
+from app.repository.list_repo import TodoListRepository
+from app.service.list_service import TodoListService
+from app.schemas.schemas import ListCreate, ListUpdate, ListResponse, TodoCreate, TodoResponse, UserRead
 
 
 router = APIRouter(tags=["Lists"], dependencies=[Depends(get_current_user)])

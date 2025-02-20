@@ -4,10 +4,10 @@ from fastapi import FastAPI, Response, status, Depends, __version__ as fastapi_v
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from user_service.core.database import User, create_db_and_tables
-from user_service.schemas import UserCreate, UserRead, UserUpdate
-from user_service.user_manage import auth_backend, current_active_user, fastapi_users
-from user_service.core.redis_db import redis_connect
+from app.core.database import User, create_db_and_tables
+from app.schemas import UserCreate, UserRead, UserUpdate
+from app.user_manage import auth_backend, current_active_user, fastapi_users
+from app.core.redis_db import redis_connect
 
 
 @asynccontextmanager

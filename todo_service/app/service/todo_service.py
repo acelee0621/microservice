@@ -1,5 +1,5 @@
-from todo_service.todos.repository.todo_repo import TodosRepository
-from todo_service.todos.schemas import TodoResponse, TodoUpdate
+from app.repository.todo_repo import TodosRepository
+from app.schemas.schemas import TodoResponse, TodoUpdate
 
 
 class TodosService:

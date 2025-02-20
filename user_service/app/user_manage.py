@@ -10,8 +10,8 @@ from fastapi_users.authentication import (
     RedisStrategy    
 )
 from fastapi_users.db import SQLAlchemyUserDatabase
-from user_service.core.database import User, get_user_db
-from user_service.core.redis_db import get_auth_redis
+from app.core.database import User, get_user_db
+from app.core.redis_db import get_auth_redis
 
 
 SECRET = "SECRET"

@@ -2,11 +2,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from todo_service.core.database import get_db
-from todo_service.core.auth import get_current_user
-from todo_service.todos.repository.todo_repo import TodosRepository
-from todo_service.todos.service.todo_service import TodosService
-from todo_service.todos.schemas import TodoUpdate, TodoResponse, UserRead
+from app.core.database import get_db
+from app.core.auth import get_current_user
+from app.repository.todo_repo import TodosRepository
+from app.service.todo_service import TodosService
+from app.schemas.schemas import TodoUpdate, TodoResponse, UserRead
 
 
 router = APIRouter(tags=["Todos"], dependencies=[Depends(get_current_user)])
