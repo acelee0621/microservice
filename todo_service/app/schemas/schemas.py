@@ -17,15 +17,19 @@ class TodoBase(BaseModel):
     content: str
     priority: str
 
+
 class TodoCreate(TodoBase):
     pass
+
     @field_validator("priority")
     def validate_priority(cls, value):
         # 将字符串转换为枚举值
         try:
             return Priority[value]  # 例如 "low" -> Priority.low
         except KeyError:
-            raise ValueError(f"Invalid priority: {value}. Must be one of {[e.name for e in Priority]}")
+            raise ValueError(
+                f"Invalid priority: {value}. Must be one of {[e.name for e in Priority]}"
+            )
 
 
 class TodoUpdate(BaseModel):  # 继承 BaseModel 避免继承 title
@@ -42,7 +46,7 @@ class TodoResponse(TodoBase):
     user_id: UUID
 
     model_config = ConfigDict(from_attributes=True)
-    
+
     # 使用 field_validator 转换 priority 字段的值
     @field_validator("priority", mode="before")
     def convert_priority(cls, value):
