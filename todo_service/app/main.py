@@ -58,3 +58,9 @@ async def health_check(response: Response, token: str | None = None):
 async def protected_route(current_user: UserRead = Depends(get_current_user)):
     """Protected route"""
     return {"message": "This is a protected route", "user": current_user}
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8001, reload=True)

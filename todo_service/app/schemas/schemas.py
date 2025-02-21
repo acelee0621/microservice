@@ -1,6 +1,8 @@
-from pydantic import BaseModel, EmailStr, ConfigDict
+from pydantic import BaseModel, EmailStr, ConfigDict, computed_field, field_validator
 from datetime import datetime
 from uuid import UUID
+
+from app.models.models import Priority
 
 
 class UserRead(BaseModel):
@@ -12,17 +14,23 @@ class UserRead(BaseModel):
 
 
 class TodoBase(BaseModel):
-    title: str
-    description: str | None = None
-
+    content: str
+    priority: str
 
 class TodoCreate(TodoBase):
     pass
+    @field_validator("priority")
+    def validate_priority(cls, value):
+        # 将字符串转换为枚举值
+        try:
+            return Priority[value]  # 例如 "low" -> Priority.low
+        except KeyError:
+            raise ValueError(f"Invalid priority: {value}. Must be one of {[e.name for e in Priority]}")
 
 
 class TodoUpdate(BaseModel):  # 继承 BaseModel 避免继承 title
-    title: str | None = None
-    description: str | None = None
+    content: str | None = None
+    priority: str | None = None
     completed: bool | None = None  # 避免默认 False
 
 
@@ -32,6 +40,15 @@ class TodoResponse(TodoBase):
     created_at: datetime
     completed: bool
     user_id: UUID
+
+    model_config = ConfigDict(from_attributes=True)
+    
+    # 使用 field_validator 转换 priority 字段的值
+    @field_validator("priority", mode="before")
+    def convert_priority(cls, value):
+        if isinstance(value, Priority):
+            return value.name  # 将枚举值转换为字符串名称
+        return value
 
     model_config = ConfigDict(from_attributes=True)
 

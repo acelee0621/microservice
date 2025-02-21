@@ -53,7 +53,7 @@ class TodoListRepository:
         query = (
             select(TodoList)
             .where(TodoList.id == list_id, TodoList.user_id == current_user.id)
-            .options(selectinload(TodoList.todos))
+            # .options(selectinload(TodoList.todos))
         )
         result = await self.session.scalars(query)
         list_ = result.one_or_none()
@@ -70,7 +70,7 @@ class TodoListRepository:
         result = await self.session.scalars(
             select(TodoList)
             .where(TodoList.user_id == current_user.id)            
-            .options(selectinload(TodoList.todos))  # selectinload 多开查询，joinedload 一次查询            
+            # .options(selectinload(TodoList.todos))             
         )
         return result.all()
 
@@ -145,8 +145,8 @@ class TodoListRepository:
         """
 
         new_todo = Todos(
-            title=data.title,
-            description=data.description,
+            content=data.content,
+            priority=data.priority,
             list_id=list_id,
             user_id=current_user.id,
         )
