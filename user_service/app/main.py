@@ -1,6 +1,4 @@
-import sys
-
-from fastapi import FastAPI, Response, status, Depends, __version__ as fastapi_version
+from fastapi import FastAPI, Response, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
@@ -59,19 +57,10 @@ app.include_router(
 
 
 # 状态检查
-@app.get("/server-status")
-async def health_check(response: Response, token: str | None = None):
-    if token == "Ace":
-        response.status_code = 200
-        data = {
-            "status": "ok 👍 ",
-            "FastAPI Version": fastapi_version,
-            "Python Version": sys.version_info,
-        }
-        return data
-    else:
-        response.status_code = status.HTTP_404_NOT_FOUND  # 404
-        return {"detail": "Not Found ❌"}
+@app.get("/health")
+async def health_check(response: Response):
+    response.status_code = 200
+    return {"status": "ok 👍 "}
 
 
 @app.get("/authenticated-route")

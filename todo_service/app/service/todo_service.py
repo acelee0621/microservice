@@ -1,12 +1,15 @@
 from app.repository.todo_repo import TodosRepository
 from app.schemas.schemas import TodoResponse, TodoUpdate
 
+from app.utils.rabbitmq import RabbitMQClient
+
 
 class TodosService:
     def __init__(self, repository: TodosRepository):
         """Service layer for todos operations."""
 
         self.repository = repository
+        self.rabbitmq = RabbitMQClient()
 
     async def get_todo(self, todo_id: int, current_user) -> TodoResponse:
         """Get a TodoItem by ID for the current user.
@@ -55,6 +58,17 @@ class TodosService:
             TodoResponse: The updated TodoItem.
         """
         updated_todo = await self.repository.update(todo_id, data, current_user)
+        if updated_todo:
+            message = {
+                "todo_id": updated_todo.id,
+                "content": updated_todo.content,
+                "priority": str(updated_todo.priority),
+                "completed": updated_todo.completed,                
+                "list_id": updated_todo.list_id,
+                "user_id": str(updated_todo.user_id),
+                "action": "updated"
+            }
+            await self.rabbitmq.send_message(message)
         return TodoResponse.model_validate(updated_todo)
 
     async def delete_todo(self, todo_id: int, current_user) -> None:
