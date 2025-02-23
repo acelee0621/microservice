@@ -1,0 +1,56 @@
+import json
+from aio_pika import connect_robust, Message, DeliveryMode
+from aio_pika.abc import AbstractRobustConnection
+
+
+async def get_rabbitmq_connection() -> AbstractRobustConnection:
+    return await connect_robust("amqp://admin:admin@localhost/")
+
+
+class RabbitMQClient:
+    def __init__(
+        self, host="amqp://admin:admin@localhost/", queue="todo_notifications"
+    ):
+        self.host = host
+        self.queue = queue
+
+    async def send_message(self, message: dict):
+        try:
+            # 连接到 RabbitMQ
+            connection = await connect_robust(self.host)
+            async with connection:
+                # 创建一个通道
+                channel = await connection.channel()
+                # 声明一个持久化的队列
+                await channel.declare_queue(self.queue, durable=True)
+                # 创建消息对象
+                message_body = json.dumps(message).encode()
+                message = Message(
+                    body=message_body,
+                    delivery_mode=DeliveryMode.PERSISTENT,  # 使消息持久化
+                )
+                # 发布消息
+                await channel.default_exchange.publish(message, routing_key=self.queue)
+                print(f" [x] Sent message to {self.queue}")
+        except Exception as e:
+            print(f"Failed to send message to RabbitMQ: {e}")
+
+
+
+# async def rabbit_consumer(websocket: WebSocket):
+#     # 连接 RabbitMQ
+#     connection = await aio_pika.connect_robust("amqp://admin:admin@localhost/")
+#     channel = await connection.channel()
+#     queue = await channel.declare_queue("todo_notifications", durable=True)
+
+#     # 消费消息
+#     async with queue.iterator() as queue_iter:
+#         async for message in queue_iter:
+#             async with message.process():  # 自动确认消息
+#                 message_body = message.body.decode()
+#                 message_data = json.loads(message_body)
+#                 # 处理过的消息，转换为 JSON 字符串
+#                 message_str = json.dumps(
+#                     message_data, ensure_ascii=False
+#                 )  
+#                 await websocket.send_text(message_str)  # 推送给客户端

@@ -1,11 +1,11 @@
 from fastapi import Request
 from redis.asyncio import Redis, ConnectionPool
 
-from app.core.config import config
+from app.core.config import settings
 
 
 cache_pool = ConnectionPool.from_url(
-    config.REDIS_URL, db=0, max_connections=10, decode_responses=True
+    settings.REDIS_URL, db=0, max_connections=10, decode_responses=True
 )
 
 

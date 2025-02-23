@@ -68,7 +68,7 @@ class TodosService:
                 "user_id": str(updated_todo.user_id),
                 "action": "updated"
             }
-            await self.rabbitmq.send_message(message)
+            await self.rabbitmq.send_message(message=message, queue="todo_notifications")
         return TodoResponse.model_validate(updated_todo)
 
     async def delete_todo(self, todo_id: int, current_user) -> None:

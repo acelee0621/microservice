@@ -23,4 +23,4 @@ def get_settings():
     return Settings()
 
 
-config = get_settings()
+settings = get_settings()
