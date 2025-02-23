@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from app.core.config import config
+from app.core.logging import setup_logging
 from app.core.database import create_db_and_tables
 from app.core.redis_db import redis_connect
 from app.core.auth import get_current_user
@@ -11,7 +12,8 @@ from app.schemas.schemas import UserRead
 from app.routers import lists_routes, todos_route, notification
 
 
-
+# Set up logging configuration
+setup_logging()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

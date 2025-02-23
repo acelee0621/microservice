@@ -9,7 +9,8 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     app_name: str = "Todos Service"
-    REDIS_URL: str    
+    REDIS_URL: str 
+    DEBUG: bool = False   
 
     
     model_config = SettingsConfigDict(env_file=(".env", ".env.local"))
