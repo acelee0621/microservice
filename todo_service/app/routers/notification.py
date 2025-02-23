@@ -13,9 +13,12 @@ active_connections = []
 
 async def process_message_for_websocket(message: dict, websocket: WebSocket):
     """处理 RabbitMQ 消息，并通过 WebSocket 发送给客户端"""
-    message_str = json.dumps(message, ensure_ascii=False)
-    await websocket.send_text(message_str)
-    logger.info(f"Sent message to WebSocket: {message}")
+    try:
+        message_str = json.dumps(message, ensure_ascii=False)
+        await websocket.send_text(message_str)
+        logger.info(f"Sent message to WebSocket: {message}")
+    except Exception as e:
+        logger.error(f"Failed to send message to WebSocket: {e}")
 
 @router.websocket("/notification/todo")
 async def websocket_endpoint(websocket: WebSocket):
@@ -42,4 +45,6 @@ async def websocket_endpoint(websocket: WebSocket):
     except Exception as e:
         logger.error(f"WebSocket错误: {e}")
     finally:
+        if not consumer_task.done():
+            consumer_task.cancel()
         await websocket.close()

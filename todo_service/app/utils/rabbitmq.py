@@ -52,7 +52,7 @@ class RabbitMQClient:
         try:
             queue_obj = await self.channel.get_queue(queue)  # 获取现有队列，避免重复声明
 
-            async def on_message(message: IncomingMessage):
+            async def on_message(message: IncomingMessage):  
                 async with message.process(ignore_processed=True):  # 手动确认模式
                     try:
                         message_body = json.loads(message.body.decode())
