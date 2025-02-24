@@ -18,7 +18,7 @@ class RabbitMQClient:
         return cls._instance
 
     def __init__(self):
-        self.host = "amqp://admin:admin@localhost/"
+        self.host = "amqp://user:bitnami@localhost/"
         self.connection: AbstractRobustConnection | None = None
         self.channel: AbstractChannel | None = None
         self._initialized = False  # 标记是否已初始化

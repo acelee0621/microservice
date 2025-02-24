@@ -36,6 +36,16 @@ class TodoUpdate(BaseModel):  # 继承 BaseModel 避免继承 title
     content: str | None = None
     priority: str | None = None
     completed: bool | None = None  # 避免默认 False
+    
+    @field_validator("priority")
+    def validate_priority(cls, value):
+        # 将字符串转换为枚举值
+        try:
+            return Priority[value]  # 例如 "low" -> Priority.low
+        except KeyError:
+            raise ValueError(
+                f"Invalid priority: {value}. Must be one of {[e.name for e in Priority]}"
+            )
 
 
 class TodoResponse(TodoBase):
