@@ -79,3 +79,5 @@ class TodosService:
             current_user (User): The current user performing the deletion.
         """
         await self.repository.delete(todo_id, current_user)
+        message = {"todo_id": todo_id, "action": "deleted"}
+        await self.rabbitmq.send_message(message=message, queue="todo_notifications")
