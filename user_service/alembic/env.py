@@ -46,8 +46,7 @@ def run_migrations_offline() -> None:
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
-        dialect_opts={"paramstyle": "named"},
-        import_models=True,
+        dialect_opts={"paramstyle": "named"},        
     )
 
     with context.begin_transaction():
@@ -57,8 +56,7 @@ def run_migrations_offline() -> None:
 def do_run_migrations(connection: Connection) -> None:
     context.configure(
         connection=connection,
-        target_metadata=target_metadata,
-        import_models=True,
+        target_metadata=target_metadata,        
     )
 
     with context.begin_transaction():
