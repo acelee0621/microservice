@@ -5,22 +5,24 @@ from contextlib import asynccontextmanager
 
 from app.core.config import settings
 from app.core.logging import setup_logging
-from app.core.database import create_db_and_tables
 from app.core.redis_db import redis_connect
 from app.core.auth import get_current_user
 from app.schemas.schemas import UserRead
 from app.routers import lists_routes, todos_route, notification
+from app.utils.migrations import run_migrations
 
 
 # Set up logging configuration
 setup_logging()
+
+# Optional: Run migrations on startup
+run_migrations()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("启动: 创建 Redis 连接池及HTTPx 客户端...")
     app.state.cache_redis = await redis_connect()
     app.state.http_client = httpx.AsyncClient()    
-    # await create_db_and_tables()
     yield
     print("关闭: 释放 Redis 连接池及关闭及HTTPx 客户端...")
     await app.state.cache_redis.aclose()
