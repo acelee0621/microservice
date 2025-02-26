@@ -1,4 +1,3 @@
-import httpx
 from fastapi import Depends, FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -20,13 +19,12 @@ run_migrations()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("启动: 创建 Redis 连接池及HTTPx 客户端...")
-    app.state.cache_redis = await redis_connect()
-    app.state.http_client = httpx.AsyncClient()    
+    print("启动: 创建 Redis 连接池...")
+    app.state.cache_redis = await redis_connect()       
     yield
-    print("关闭: 释放 Redis 连接池及关闭及HTTPx 客户端...")
+    print("关闭: 释放 Redis 连接池...")
     await app.state.cache_redis.aclose()
-    await app.state.http_client.aclose()
+    
 
 
 app = FastAPI(title=settings.app_name, version="0.1.0", lifespan=lifespan)

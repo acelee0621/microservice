@@ -2,17 +2,21 @@ from fastapi import FastAPI, Response, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from app.core.database import User, create_db_and_tables
+from app.core.database import User
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.user_manage import auth_backend, current_active_user, fastapi_users
 from app.core.redis_db import redis_connect
+from app.utils.migrations import run_migrations
+
+
+# Optional: Run migrations on startup
+run_migrations()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("启动: 创建 Redis 连接池...")
-    app.state.auth_redis = await redis_connect()
-    await create_db_and_tables()
+    app.state.auth_redis = await redis_connect()    
     yield
     print("关闭: 释放 Redis 连接池...")
     await app.state.auth_redis.aclose()
