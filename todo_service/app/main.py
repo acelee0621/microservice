@@ -1,6 +1,6 @@
 from fastapi import Depends, FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, AsyncExitStack
 
 from app.core.config import settings
 from app.core.logging import setup_logging
@@ -19,11 +19,14 @@ run_migrations()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    app.state.exit_stack = AsyncExitStack()
     print("启动: 创建 Redis 连接池...")
-    app.state.cache_redis = await redis_connect()       
+    app.state.cache_redis = await redis_connect()    
     yield
     print("关闭: 释放 Redis 连接池...")
-    await app.state.cache_redis.aclose()
+    if app.state.cache_redis:
+        await app.state.cache_redis.aclose()
+    await app.state.exit_stack.aclose()
     
 
 
