@@ -1,3 +1,4 @@
+# src/core/auth.py
 import json
 from loguru import logger
 from httpx import AsyncClient, HTTPStatusError, RequestError
