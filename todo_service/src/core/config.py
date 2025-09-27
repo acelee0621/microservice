@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     redis_host: str = "localhost:6379"
     
     # 用户管理微服务的 URL
-    user_service_url: str = "http://127.0.0.1:8000"
+    user_service_url: str = "http://localhost:8000"
     
 
     model_config = SettingsConfigDict(

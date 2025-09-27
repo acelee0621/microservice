@@ -22,7 +22,7 @@ async def get_current_user(
     http_client: AsyncClient = Depends(get_http_client),
 ) -> UserRead:
     """通过 Redis 缓存和用户管理微服务验证令牌，获取当前用户信息"""
-    logger.info(f"Verifying token: {token!r}")
+
     # 1. 先查询 Redis 缓存是否已有用户信息
     cached_user = await redis.get(f"user:{token}")
     if cached_user:

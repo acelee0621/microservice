@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from loguru import logger
 from redis.asyncio import Redis
+from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     AsyncSession,
@@ -30,6 +31,7 @@ class AppState(TypedDict):
     engine: AsyncEngine
     session_factory: async_sessionmaker[AsyncSession]
     redis: Redis
+    http_client: AsyncClient
 
 
 @asynccontextmanager
@@ -42,10 +44,17 @@ async def lifespan(app: FastAPI) -> AsyncIterator[AppState]:
     await create_db_and_tables(engine)
     redis = await setup_redis()
     logger.info("Redis 已就绪。")
+    http_client = AsyncClient()
 
-    yield {"engine": engine, "session_factory": session_factory, "redis": redis}
+    yield {
+        "engine": engine,
+        "session_factory": session_factory,
+        "redis": redis,
+        "http_client": http_client,
+    }
 
     # -------- 关闭 --------
     await close_database_connection(engine)
     await close_redis(redis)
+    await http_client.aclose()
     logger.info("应用关闭，资源已释放。")

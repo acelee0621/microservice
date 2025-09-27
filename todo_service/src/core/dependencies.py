@@ -1,14 +1,13 @@
+from typing import cast
 from fastapi import Request
-import httpx
+from httpx import AsyncClient
+
+
+
 
 # HTTP 客户端依赖
-async def get_http_client(request: Request) -> httpx.AsyncClient:
-    return httpx.AsyncClient()
-
-
-
-
-
+async def get_http_client(request: Request) -> AsyncClient:
+    return cast(AsyncClient, request.state.http_client)
 
 
 

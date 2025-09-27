@@ -48,8 +48,8 @@ USER appuser
 ENV PATH="/app/.venv/bin:$PATH"
 
 # 暴露 FastAPI 将要使用的端口
-EXPOSE 8000
+EXPOSE 8001
 
 
 # 默认启动命令（虽然在 docker-compose 中会被覆盖，但这是一个好习惯）
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8001"]
