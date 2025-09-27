@@ -6,8 +6,8 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "aiosqlite>=0.21.0",
-    "alembic>=1.14.1",
     "fastapi-users[sqlalchemy]>=14.0.1",
-    "fastapi[all]>=0.115.8",    
-    "redis>=5.2.1",
+    "fastapi[standard]>=0.115.8",
+    "loguru>=0.7.3",
+    "pydantic-settings>=2.11.0",
 ]

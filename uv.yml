@@ -1,5 +1,5 @@
 services:
   user_service:
-    run: "uvicorn user_service.main:app --host 0.0.0.0 --port 8000 --reload"
+    run: "uvicorn user_service.src.main:app --host 0.0.0.0 --port 8000 --reload"
   todo_service:
-    run: "uvicorn todo_service.main:app --host 0.0.0.0 --port 8001 --reload"
+    run: "uvicorn todo_service.src.main:app --host 0.0.0.0 --port 8001 --reload"

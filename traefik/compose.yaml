@@ -1,0 +1,22 @@
+
+
+services:
+  traefik:
+    image: traefik:latest
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=traefik-net   # 👈 关键
+      - --entrypoints.web.address=:80
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   # 必须，能扫全 host 的容器
+    networks:
+      - traefik-net
+
+networks:
+  traefik-net:
+    external: true
